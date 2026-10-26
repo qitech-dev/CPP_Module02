@@ -47,3 +47,13 @@ Fixed::Fixed(const float value)
 	_rawBits = roundf(value * (1 << _fractionalBits));
 	std::cout << "Float constructor called" << std::endl;
 }
+
+float Fixed::toFloat(void) const
+{
+	return (float)_rawBits / (1 << _fractionalBits);
+}
+
+int Fixed::toInt(void) const
+{
+	return _rawBits / (1 << _fractionalBits);
+}
