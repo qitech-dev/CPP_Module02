@@ -3,15 +3,12 @@
 
 int main(void)
 {
-	Fixed a;
-	Fixed b(a);
-	Fixed c;
+	Fixed a(42.42f);
+	Fixed b(10);
 
-	c = b;
-
-	std::cout << a.getRawBits() << std::endl;
-	std::cout << b.getRawBits() << std::endl;
-	std::cout << c.getRawBits() << std::endl;
+	std::cout << "a = " << a << std::endl;
+	std::cout << "b = " << b << std::endl;
+	std::cout << "a as int = " << a.toInt() << std::endl;
 
 	return 0;
 }
