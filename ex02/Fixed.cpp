@@ -24,7 +24,19 @@ Fixed::Fixed(const int value)
 
 Fixed::Fixed(const float value)
 {
-	_rawBits = roundf(value * (1 << _fractionalBits));
+	const double minRaw = std::numeric_limits<int>::min();
+	const double maxRaw = std::numeric_limits<int>::max();
+	const double scaledValue = static_cast<double>(value) * (1 << _fractionalBits);
+
+	if (!(scaledValue >= minRaw - 0.5 && scaledValue <= maxRaw + 0.5))
+		throw std::overflow_error("Fixed float construction out of range");
+
+	const double raw = roundf(static_cast<float>(scaledValue));
+
+	if (!(raw >= minRaw && raw <= maxRaw))
+		throw std::overflow_error("Fixed float construction overflow");
+
+	_rawBits = static_cast<int>(raw);
 	std::cout << "Float constructor called" << std::endl;
 }
 
