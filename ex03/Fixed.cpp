@@ -117,17 +117,31 @@ bool Fixed::operator!=(const Fixed& other) const
 
 Fixed Fixed::operator+(const Fixed& other) const
 {
-	Fixed result;
+	const int a = _rawBits;
+	const int b = other._rawBits;
+	const int maxInt = std::numeric_limits<int>::max();
+	const int minInt = std::numeric_limits<int>::min();
 
-	result.setRawBits(_rawBits + other._rawBits);
+	if ((b > 0 && a > maxInt - b) || (b < 0 && a < minInt - b))
+		throw std::overflow_error("Fixed addition overflow");
+
+	Fixed result;
+	result.setRawBits(a + b);
 	return (result);
 }
 
 Fixed Fixed::operator-(const Fixed& other) const
 {
-	Fixed result;
+	const int a = _rawBits;
+	const int b = other._rawBits;
+	const int maxInt = std::numeric_limits<int>::max();
+	const int minInt = std::numeric_limits<int>::min();
 
-	result.setRawBits(_rawBits - other._rawBits);
+	if ((b > 0 && a < minInt + b) || (b < 0 && a > maxInt + b))
+		throw std::overflow_error("Fixed subtraction overflow");
+
+	Fixed result;
+	result.setRawBits(a - b);
 	return (result);
 }
 
