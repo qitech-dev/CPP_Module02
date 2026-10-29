@@ -195,27 +195,33 @@ Fixed Fixed::operator/(const Fixed& other) const
 
 Fixed& Fixed::operator++()
 {
-	_rawBits++;
-	return (*this);
+	if (_rawBits == std::numeric_limits<int>::max())
+		throw std::overflow_error("Fixed increment overflow");
+
+	++_rawBits;
+	return *this;
 }
 
 Fixed Fixed::operator++(int)
 {
 	Fixed old(*this);
-	_rawBits++;
+	++(*this);
 	return old;
 }
 
 Fixed& Fixed::operator--()
 {
-	_rawBits--;
-	return (*this);
+	if (_rawBits == std::numeric_limits<int>::min())
+		throw std::overflow_error("Fixed decrement overflow");
+
+	--_rawBits;
+	return *this;
 }
 
 Fixed Fixed::operator--(int)
 {
 	Fixed old(*this);
-	_rawBits--;
+	--(*this);
 	return old;
 }
 
