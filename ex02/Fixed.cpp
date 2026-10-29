@@ -1,6 +1,8 @@
 #include "Fixed.hpp"
 #include <iostream>
 #include <cmath>
+#include <limits>
+#include <stdexcept>
 
 Fixed::Fixed(): _rawBits(0)
 {
@@ -9,7 +11,14 @@ Fixed::Fixed(): _rawBits(0)
 
 Fixed::Fixed(const int value)
 {
-	_rawBits = value * (1 << _fractionalBits);
+	const int scale = 1 << _fractionalBits;
+	const int minInt = std::numeric_limits<int>::min();
+	const int maxInt = std::numeric_limits<int>::max();
+
+	if (value < minInt / scale || value > maxInt / scale)
+		throw std::overflow_error("Fixed integer construction overflow");
+	
+	_rawBits = value * scale;
 	std::cout << "Int constructor called" << std::endl;
 }
 
@@ -112,15 +121,50 @@ Fixed Fixed::operator-(const Fixed& other) const
 
 Fixed Fixed::operator*(const Fixed& other) const
 {
-	Fixed result;
+	long product = static_cast<long>(_rawBits) * other._rawBits;
+	long raw = product / (1L << _fractionalBits);
 
-	result.setRawBits(_rawBits * other._rawBits / (1 << _fractionalBits));
+	if (raw > std::numeric_limits<int>::max()
+		|| raw < std::numeric_limits<int>::min())
+		throw std::overflow_error("Fixed multiplication overflow");
+	
+	Fixed result;
+	result.setRawBits(static_cast<int>(raw));
+
 	return (result);
 }
 
 Fixed Fixed::operator/(const Fixed& other) const
 {
-	return Fixed(toFloat() / other.toFloat());
+	if (other._rawBits == 0)
+		throw std::domain_error("Division by zero");
+
+	long numerator = static_cast<long>(_rawBits) * (1L << _fractionalBits);
+
+	long denominator = other._rawBits;
+
+	long quotient = numerator / denominator;
+	long remainder = numerator % denominator;
+
+	long absRem = remainder < 0 ? -remainder : remainder;
+	long absDen = denominator < 0 ? -denominator : denominator;
+
+	if (2 * absRem >= absDen)
+	{
+		if ((numerator < 0) != (denominator < 0))
+			quotient--;
+		else
+			quotient++;
+	}
+
+	if (quotient > std::numeric_limits<int>::max()
+		|| quotient < std::numeric_limits<int>::min())
+		throw std::overflow_error("Fixed division pverflow");
+	
+	Fixed result;
+	result.setRawBits(static_cast<int>(quotient));
+
+	return result;
 }
 
 Fixed& Fixed::operator++()

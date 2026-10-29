@@ -1,6 +1,8 @@
 #include "Fixed.hpp"
 #include <iostream>
 #include <cmath>
+#include <limits>
+#include <stdexcept>
 
 Fixed::Fixed(): _rawBits(0)
 {
@@ -9,7 +11,14 @@ Fixed::Fixed(): _rawBits(0)
 
 Fixed::Fixed(const int value)
 {
-	_rawBits = value * (1 << _fractionalBits);
+	const int scale = 1 << _fractionalBits;
+	const int minInt = std::numeric_limits<int>::min();
+	const int maxInt = std::numeric_limits<int>::max();
+
+	if (value < minInt / scale || value > maxInt / scale)
+		throw std::overflow_error("Fixed integer construction overflow");
+	
+	_rawBits = value * scale;
 	std::cout << "Int constructor called" << std::endl;
 }
 

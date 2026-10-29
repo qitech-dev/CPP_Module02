@@ -1,20 +1,26 @@
 #include "Point.hpp"
 
-static Fixed cross(const Point& a,const Point& b, const Point& p)
+static long double cross(const Point& a,const Point& b, const Point& p)
 {
-	return (b.getX() - a.getX())*(p.getY() - a.getY()) - (b.getY() - a.getY())*(p.getX() - a.getX());
+	long double abx = static_cast<long double>(b.getX().getRawBits()) - a.getX().getRawBits();
+
+	long double aby = static_cast<long double>(b.getY().getRawBits()) - a.getY().getRawBits();
+
+	long double apx = static_cast<long double>(p.getX().getRawBits()) - a.getX().getRawBits();
+
+	long double apy = static_cast<long double>(p.getY().getRawBits()) - a.getY().getRawBits();
+
+	return abx * apy - aby * apx;
 }
 
 bool bsp(Point const a, Point const b, Point const c, Point const point)
 {
-	Fixed c1 = cross(a, b, point);
-	Fixed c2 = cross(b, c, point);
-	Fixed c3 = cross(c, a, point);
+	long double c1 = cross(a, b, point);
+	long double c2 = cross(b, c, point);
+	long double c3 = cross(c, a, point);
 
-	Fixed zero(0);
-
-	if ((c1 > zero && c2 > zero && c3 > zero)
-		|| (c1 < zero && c2 < zero && c3 < zero))
+	if ((c1 > 0 && c2 > 0 && c3 > 0) || (c1 < 0 && c2 < 0 && c3 < 0))
 		return true;
+	
 	return false;
 }
