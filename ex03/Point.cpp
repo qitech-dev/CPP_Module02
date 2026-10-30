@@ -14,8 +14,10 @@ Point::Point(const Point& other) : x(other.x), y(other.y)
 
 Point& Point::operator=(const Point& other)
 {
-	(void)other;
-	return *this;
+    // Coordinates are const.
+    // Assignment intentionally leaves this point unchanged.
+    (void)other;
+    return *this;
 }
 
 Point::~Point()
